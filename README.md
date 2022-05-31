@@ -1,14 +1,13 @@
 # vec_replace
 
-`vec_replace` is an R function for finding and replacing strings withing a vector.
+`vec_replace` is an R function for finding and replacing elements of a vector.
 
 
 ### Inputs
 
 The `vec_replace` function has three inputs:
 
-
-* `` = a vector of string in which to search and replace
+* `x` = a vector of string in which to search and replace
 * `find` =  the strings to look for
 * `replace` = the strings to replace
 
@@ -32,6 +31,7 @@ replace = c("test1", "test2")
 
 x_replace = vec_replace(x, find, replace)
 
+x_replace
 [1] "test1" "Harry" "Sally" "test2" "David"
 
 ```
