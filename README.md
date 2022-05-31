@@ -12,7 +12,7 @@ The `vec_replace` function has three inputs:
 * `find` =  the strings to look for
 * `replace` = the strings to replace
 
-
+Note: `find` and `replace` must have the same length.
 
 ### Output
 `vec_replace` returns the vector `x` with the appropriate substitutions. 
@@ -32,6 +32,7 @@ replace = c("test1", "test2")
 
 x_replace = vec_replace(x, find, replace)
 
+[1] "test1" "Harry" "Sally" "test2" "David"
 
 ```
 

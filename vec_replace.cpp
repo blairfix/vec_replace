@@ -20,6 +20,15 @@ CharacterVector vec_replace(
     // sort x and keep sorted ids
     ///-----------------------------------------------------
 
+    // test if find and replace are same length
+    // if not, throw exception 
+    int n_find = find.size();
+    int n_replace = replace.size();
+
+    if( n_find != n_replace){
+	throw std::invalid_argument( "find and replace vectors are different lengths");
+    }
+
     // make original id vector
     int n_x = x.size();
     IntegerVector id_x = seq(0, n_x - 1);
@@ -36,7 +45,6 @@ CharacterVector vec_replace(
     ///-----------------------------------------------------
 
     // make original id vector
-    int n_find = find.size();
     IntegerVector id_find = seq(0, n_find - 1);
 
     // get index of sorted ids
