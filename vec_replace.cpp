@@ -4,16 +4,18 @@
 #include <numeric>      
 #include <algorithm> 
 
+#include <iostream>
+
 using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
 
 CharacterVector vec_replace( 
-			    CharacterVector x,
-			    CharacterVector find,
-			    CharacterVector replace
-			    )
+	CharacterVector x,
+	CharacterVector find,
+	CharacterVector replace
+	)
 
 {
 
@@ -34,8 +36,8 @@ CharacterVector vec_replace(
     IntegerVector id_x = seq(0, n_x - 1);
 
     // get index of sorted ids
-     std::iota( id_x.begin(), id_x.end(), 0 ); 
-     std::sort( id_x.begin(), id_x.end(), [&](int i,int j){return x[i] < x[j]; } );
+    std::iota( id_x.begin(), id_x.end(), 0 ); 
+    std::sort( id_x.begin(), id_x.end(), [&](int i,int j){return x[i] < x[j]; } );
 
     // sort x 
     x = x[id_x];
@@ -48,30 +50,32 @@ CharacterVector vec_replace(
     IntegerVector id_find = seq(0, n_find - 1);
 
     // get index of sorted ids
-     std::iota( id_find.begin(), id_find.end(), 0); 
-     std::sort( id_find.begin(), id_find.end(), [&](int i,int j){return find[i] < find[j]; } );
+    std::iota( id_find.begin(), id_find.end(), 0); 
+    std::sort( id_find.begin(), id_find.end(), [&](int i,int j){return find[i] < find[j]; } );
 
     // sort find and replace
     find = find[id_find];
     replace = replace[id_find];
 
 
-
-    // loop over x_sorted and find / replace
+    // loop over x and find / replace
     int find_counter = 0;
 
     for( int i = 0; i < n_x; i++ ){
 
-	// if find counter not at end
+	// while x greater than find, advance find_counter
+	while(  x[i] > find[ find_counter] ) find_counter++;
+
+
+	// if find counter not at end of find
 	// and x matches find at current counter
-	//  then replace x with replace
-	    
+	// then replace x with replace
 
 	if( find_counter < n_find && x[i] == find[ find_counter ] ){
-	    
+
 	    // save old element
 	    String x_old = x[i];
-	    
+
 	    // replace element
 	    x[i] =  replace[ find_counter ];
 
@@ -94,18 +98,13 @@ CharacterVector vec_replace(
     // return x to original order
     //-----------------------------------------------------
 
+    StringVector output(n_x);
 
-    // make final id vector
-    IntegerVector id_final = seq(0, n_x - 1);
+    for( int i = 0; i < n_x; i++ ){
+	int index = id_x[i];
+	output[index] = x[i];
+    }
 
-    // get index of sorted ids
-     std::iota( id_final.begin(), id_final.end(), 0); 
-     std::sort( id_final.begin(), id_final.end(), [&](int i,int j){return id_x[i] < id_x[j]; } );
-
-    // sort in original order
-     x = x[id_final];
-
-
-    return x;
+    return output;
 
 }
