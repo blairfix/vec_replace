@@ -1,110 +1,53 @@
 #include <Rcpp.h>
 #include <string>
+#include <map>
 #include <vector>
-#include <numeric>      
-#include <algorithm> 
-
-#include <iostream>
 
 using namespace Rcpp;
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::export]]
 
-CharacterVector vec_replace( 
-	CharacterVector x,
-	CharacterVector find,
-	CharacterVector replace
+std::vector<std::string> vec_replace( 
+	std::vector<std::string> x, 
+	std::vector<std::string> find,
+	std::vector<std::string> replace
 	)
-
 {
 
-    // sort x and keep sorted ids
-    ///-----------------------------------------------------
 
     // test if find and replace are same length
     // if not, throw exception 
-    int n_find = find.size();
-    int n_replace = replace.size();
-
-    if( n_find != n_replace){
-	throw std::invalid_argument( "find and replace vectors are different lengths");
+    if( find.size() != replace.size() ){
+	throw std::invalid_argument( "Find and replace vectors are different lengths");
     }
 
-    // make original id vector
-    int n_x = x.size();
-    IntegerVector id_x = seq(0, n_x - 1);
+    // map of find keys
+    std::unordered_map<std::string, bool> find_map;
 
-    // get index of sorted ids
-    std::iota( id_x.begin(), id_x.end(), 0 ); 
-    std::sort( id_x.begin(), id_x.end(), [&](int i,int j){return x[i] < x[j]; } );
-
-    // sort x 
-    x = x[id_x];
+    // map of replace keys
+    std::unordered_map<std::string, std::string> replace_map;
 
 
-    // sort find and replace in same order
-    ///-----------------------------------------------------
+    // loop over find and push values into find_map and replace_map
+    for(int i = 0; i < find.size(); i++){
 
-    // make original id vector
-    IntegerVector id_find = seq(0, n_find - 1);
+        find_map[ find[i] ] = true;
+        replace_map[ find[i] ] = replace[i];
 
-    // get index of sorted ids
-    std::iota( id_find.begin(), id_find.end(), 0); 
-    std::sort( id_find.begin(), id_find.end(), [&](int i,int j){return find[i] < find[j]; } );
-
-    // sort find and replace
-    find = find[id_find];
-    replace = replace[id_find];
+    }
 
 
-    // loop over x and find / replace
-    int find_counter = 0;
+    // loop over x 
+    // if x value in find_map, replace it with the value from replace_map
+    for(int i = 0; i < x.size(); i++){
 
-    for( int i = 0; i < n_x; i++ ){
+        if( find_map[ x[i] ] == true){
 
-	// while x greater than find, advance find_counter
-	while(  x[i] > find[ find_counter] ) find_counter++;
+	    x[i] = replace_map[ x[i] ];
 
-
-	// if find counter not at end of find
-	// and x matches find at current counter
-	// then replace x with replace
-
-	if( find_counter < n_find && x[i] == find[ find_counter ] ){
-
-	    // save old element
-	    String x_old = x[i];
-
-	    // replace element
-	    x[i] =  replace[ find_counter ];
-
-	    // if next element still in x
-	    // test if next element of x equals current element
-	    // if true, then advance find counter
-
-	    if( i + 1 < n_x ){
-
-		if( x_old != x[i+1] ){
-
-		    find_counter++;
-
-		}
-	    }
 	}
     }
 
-
-    // return x to original order
-    //-----------------------------------------------------
-
-    StringVector output(n_x);
-
-    for( int i = 0; i < n_x; i++ ){
-	int index = id_x[i];
-	output[index] = x[i];
-    }
-
-    return output;
-
+    return x;
 }
